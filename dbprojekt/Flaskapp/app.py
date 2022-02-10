@@ -9,7 +9,7 @@ from flask import render_template, request
 import psycopg2
 
 db = SQLAlchemy()
-conn = psycopg2.connect(dbname="cc3201", user="cc3201", password="Pahno3Poayao", host="cc3201.dcc.uchile.cl", port="5537")
+conn = psycopg2.connect(SECRET)
 cur = conn.cursor()
 
 app=Flask(__name__)
