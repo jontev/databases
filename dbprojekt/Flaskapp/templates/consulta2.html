@@ -1,0 +1,29 @@
+</html>
+<!-- Search Bar -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-  
+        scale=1">
+        <link rel="stylesheet" 
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-
+        awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="/static/index.css">
+    </head>
+    <body>
+        <h1><center>Consulta 2</center></h1>
+        
+        <p></p>
+        <center>
+          <p>
+            Estado-Ciudad-Rango más violento-Rango más educado-Rango menos pobreza
+          </p>
+        {% for row in results %}
+            <tr>
+                <td> {{row}} </td>
+                </br>
+            </tr>
+        {% endfor %}
+        </center>
+    </body>
+</html>

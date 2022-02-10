@@ -1,0 +1,79 @@
+1.
+SELECT ?nomMuj ?nomUni WHERE {
+  ?uni wdt:P31/wdt:P279* wd:Q3918 .
+  ?uni wdt:P17 wd:Q298 .
+  
+  ?muj wdt:P69 ?uni .
+  ?muj wdt:P21 wd:Q6581072 .
+  
+  ?muj rdfs:label ?nomMuj .
+  ?uni rdfs:label ?nomUni .
+  
+  FILTER(lang(?nomMuj)="es" && lang(?nomUni)="es")
+}
+
+2.
+SELECT ?nomPer ?nomUni ?fecha WHERE {
+  ?uni wdt:P31/wdt:P279* wd:Q3918 .
+  ?uni wdt:P17 wd:Q298 .
+  
+  ?per wdt:P69 ?uni .
+  ?per wdt:P570 ?fecha .
+  
+  ?per rdfs:label ?nomPer .
+  ?uni rdfs:label ?nomUni .
+  
+  FILTER(lang(?nomPer)="es" && lang(?nomUni)="es")
+}
+
+3.
+SELECT ?nomDir ?nomUni  WHERE {
+  ?uni wdt:P31/wdt:P279* wd:Q3918 .
+  ?uni wdt:P17 wd:Q298 .
+  
+  ?dir wdt:P69 ?uni .
+  ?dir wdt:P106/wdt:P279* wd:Q2526255.
+  
+  ?dir rdfs:label ?nomDir .
+  ?uni rdfs:label ?nomUni .
+  
+  FILTER(lang(?nomDir)="es" && lang(?nomUni)="es")
+}
+
+4.
+SELECT ?nomPel ?nomDir ?nomUni  WHERE {
+  ?uni wdt:P31/wdt:P279* wd:Q3918 .
+  ?uni wdt:P17 wd:Q298 .
+  
+  ?dir wdt:P69 ?uni .
+  ?dir wdt:P106/wdt:P279* wd:Q2526255.
+  
+  ?pel wdt:P31/wdt:P279* wd:Q11424 .
+  ?pel wdt:P57 ?dir .
+  
+  ?dir rdfs:label ?nomDir .
+  ?uni rdfs:label ?nomUni .
+  ?pel rdfs:label ?nomPel .
+  
+  FILTER(lang(?nomDir)="es" && lang(?nomUni)="es" && lang(?nomPel)="es")
+}
+
+5.
+SELECT ?nomPel ?nomDir ?nomUni ?fecha WHERE {
+  ?uni wdt:P31/wdt:P279* wd:Q3918 . #universidades
+  ?uni wdt:P17 wd:Q298 .
+  
+  ?dir wdt:P69 ?uni .
+  ?dir wdt:P106/wdt:P279* wd:Q2526255.
+  
+  ?pel wdt:P31/wdt:P279* wd:Q11424 .
+  ?pel wdt:P57 ?dir .
+  ?pel wdt:P577/wdt:P279* ?fecha .
+  
+  ?dir rdfs:label ?nomDir .
+  ?uni rdfs:label ?nomUni .
+  ?pel rdfs:label ?nomPel .
+  
+  FILTER(lang(?nomDir)="es" && lang(?nomUni)="es" && lang(?nomPel)="es")
+}
+ORDER BY ?fecha

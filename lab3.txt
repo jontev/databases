@@ -1,0 +1,36 @@
+1.
+SELECT * FROM pelicula WHERE anho BETWEEN 1980 AND 1990 ORDER BY calificacion DESC; 
+
+2.
+SELECT personaje FROM personaje WHERE a_nombre = 'Bridges, Jeff (I)' ORDER BY p_anho;
+
+3. 
+SELECT pelicula from pelicula, personaje WHERE nombre = p_nombre AND a_nombre = 'Bridges, Jeff (I)' ORDER BY calificacion DESC;
+
+4.
+SELECT personaje FROM personaje, pelicula, actor WHERE genero = 'F' AND anho BETWEEN 1990 AND 2000 AND calificacion > 8.7 AND p_nombre = pelicula.nombre AND a_nombre = actor.nombre;
+
+5.
+SELECT * FROM pelicula WHERE nombre LIKE 'The Lord of the Rings%' ORDER BY calificacion DESC, anho; 
+# t minúscula en "the"...
+
+6.
+SELECT DISTINCT p1.a_nombre FROM personaje p1 JOIN personaje p2 ON p1.p_nombre=p2.p_nombre AND p1.a_nombre=p2.a_nombre AND p1.p_anho=p2.p_anho AND p1.personaje <> p2.personaje;
+
+7.
+SELECT p1.p_nombre FROM personaje p1 JOIN personaje p2 ON p1.p_nombre=p2.p_nombre AND p1.p_anho=p2.p_anho AND
+p1.a_nombre = 'Thurman, Uma' AND p2.a_nombre = 'Jackson, Samuel L.';
+
+8. 
+SELECT p_nombre FROM personaje WHERE a_nombre ='Thurman, Uma' EXCEPT SELECT DISTINCT p1.p_nombre FROM personaje p1
+JOIN personaje p2 ON p1.p_nombre=p2.p_nombre AND p2.p_anho=p1.p_anho AND p1.a_nombre='Thurman, Uma' AND
+p2.a_nombre='Jackson, Samuel L.';
+
+9.
+SELECT DISTINCT t1.a1, t1.a2 FROM (SELECT p1.p_nombre AS n, p1.a_nombre AS a1, p2.a_nombre AS a2 FROM personaje p1 JOIN personaje p2 ON p1.p_nombre=p2.p_nombre AND p1.p_anho=p2.p_anho AND p1.a_nombre <> p2.a_nombre AND p1.a_nombre < p2.a_nombre)
+AS t1, (SELECT p1.p_nombre AS n, p1.a_nombre AS a1, p2.a_nombre AS a2 FROM personaje p1 JOIN personaje p2 ON p1.p_nombre=p2.p_nombre AND p1.p_anho=p2.p_anho AND p1.a_nombre <> p2.a_nombre AND p1.a_nombre < p2.a_nombre)
+AS t2 WHERE t1.a1=t2.a1 AND t1.a2=t2.a2 AND t1.n <> t2.n;
+
+10.
+SELECT nombre FROM pelicula WHERE calificacion NOT IN (SELECT p1.calificacion FROM pelicula p1, pelicula p2 WHERE
+p1.calificacion < p2.calificacion);

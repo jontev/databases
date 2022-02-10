@@ -1,0 +1,107 @@
+MI "grupo" se llama aaqwerty
+
+p1
+a) 
+
+Sacar todas las pares en la misma pelicula
+SELECT p1.a_nombre as a, p2.a_nombre as b, p1.p_nombre as p FROM personaje p1 JOIN personaje p2 on p1.p_nombre=p2.p_nombre;
+Evitar repeticiones (a,a)
+SELECT p1.a_nombre as a, p2.a_nombre as b, p1.p_nombre as p FROM personaje p1 JOIN personaje p2 on p1.p_nombre=p2.p_nombre AND p1.a_nombre<>p2.a_nombre;
+Evitar pares simétricas (a,b)(b,a)
+SELECT p1.a_nombre as a, p2.a_nombre as b, p1.p_nombre as p FROM personaje p1 JOIN personaje p2 on p1.p_nombre=p2.p_nombre AND p1.a_nombre<>p2.a_nombre AND p1.a_nombre>p2.a_nombre;
+Conteo (contando un actor apereciendo en la misma pelicula en varios papeles solo una vez)
+SELECT t.a AS a, t.b AS b, COUNT(t.p) AS conteo FROM (SELECT DISTINCT p1.a_nombre as a, p2.a_nombre as b, p1.p_nombre as p FROM personaje p1 JOIN personaje p2 on p1.p_nombre=p2.p_nombre AND p1.a_nombre<>p2.a_nombre AND p1.a_nombre>p2.a_nombre) AS t GROUP BY (t.a, t.b);
+Tomando el tiempo
+EXPLAIN ANALYZE SELECT t.a AS a, t.b AS b, COUNT(t.p) AS conteo FROM (SELECT DISTINCT p1.a_nombre as a, p2.a_nombre as b, p1.p_nombre as p FROM personaje p1 JOIN personaje p2 on p1.p_nombre=p2.p_nombre AND p1.a_nombre<>p2.a_nombre AND p1.a_nombre>p2.a_nombre) AS t GROUP BY (t.a, t.b);
+
+Tiempo= 11152.935 ms
+
+
+b)
+Cambiando esquema
+SET search_path TO lab8_p;
+Creando la vista (con la tabla personaje de otra esquema)
+CREATE VIEW blabla AS SELECT t.a AS a, t.b AS b, COUNT(t.p) AS conteo FROM (SELECT DISTINCT p1.a_nombre as a, p2.a_nombre as b, p1.p_nombre as p FROM lab8_b.personaje p1 JOIN lab8_b.personaje p2 on p1.p_nombre=p2.p_nombre AND p1.a_nombre<>p2.a_nombre AND p1.a_nombre>p2.a_nombre) AS t GROUP BY (t.a, t.b);
+Tomando el tiempo
+EXPLAIN ANALYZE SELECT * FROM blabla;
+
+Tiempo: 10987.820 ms
+
+Borrando
+DROP VIEW blabla;
+
+c)
+Materializada
+CREATE MATERIALIZED VIEW blabla AS SELECT t.a AS a, t.b AS b, COUNT(t.p) AS conteo FROM (SELECT DISTINCT p1.a_nombre as a, p2.a_nombre as b, p1.p_nombre as p FROM lab8_b.personaje p1 JOIN lab8_b.personaje p2 on p1.p_nombre=p2.p_nombre AND p1.a_nombre<>p2.a_nombre AND p1.a_nombre>p2.a_nombre) AS t GROUP BY (t.a, t.b);
+Tomando el tiempo
+EXPLAIN ANALYZE SELECT * FROM blabla;
+
+Tiempo: 6351.591 ms
+
+Borrando
+DROP MATERIALIZED VIEW blabla;
+
+p2
+a)
+SELECT foo.a AS a, COUNT(p) AS conteo FROM (SELECT p1.a_nombre AS a, p1.p_nombre AS p FROM personaje p1 WHERE p1.p_nombre IN (SELECT p_nombre FROM personaje p2 WHERE a_nombre='Pesci, Joe') AND p1.a_nombre <> 'Pesci, Joe') AS foo GROUP BY foo.a ORDER BY conteo DESC;
+
+Tiempo: 30.679 ms
+b)
+EXPLAIN ANALYZE SELECT CASE WHEN t.b='Pesci, Joe' THEN t.a WHEN t.a='Pesci, Joe' THEN t.b END AS a, t.conteo AS conteo FROM (SELECT * FROM blabla WHERE a='Pesci, Joe' OR b='Pesci, Joe') AS t ORDER BY conteo DESC;
+
+Tiempo: 
+1044.254 ms
+
+c)
+Tiempo con vista materializada: 222.141 ms
+Mejor que la alternativa con vista de b) pero peor que a)
+
+Con (a,b) como indice
+CREATE INDEX idx ON blabla (a,b);
+Tiempo con este indice: 212.257 ms
+No mucho mejor que antes
+
+p3
+a)
+INSERT INTO lab8_p.eval VALUES ('aaqwerty', 'Jagten', 2012, 'weeeena', 10);
+INSERT INTO lab8_p.eval VALUES ('aaqwerty', 'M', 1931, 'nombre corto, nunca he visto', 10);
+
+b)
+CREATE VIEW aaqwertyEval AS SELECT * FROM eval WHERE g_nombre='aaqwerty' OR p_nombre IN (SELECT p_nombre FROM eval WHERE g_nombre='aaqwerty');
+
+CREATE MATERIALIZED VIEW aaqwertyEvalMat AS SELECT * FROM eval WHERE g_nombre='aaqwerty' OR p_nombre IN (SELECT p_nombre FROM eval WHERE g_nombre='aaqwerty');
+
+c)
+INSERT INTO lab8_p.eval VALUES('aaqwerty', 'Goodfellas', 1990, 'afasfafihsafhoiafs', 9);
+INSERT INTO lab8_p.eval VALUES('aaqwerty', 'The Departed', 2006, 'uouduasoduu', 10);
+
+d)
+SELECT * FROM aaqwertyEval;
+Retorna todas las evaluaciones incluso las dos ultimas
+SELECT * FROM aaqwertyEvalMat;
+No retorna las dos ultimas, porque la vista virtual efectivamente es una subconsulta que se ejecuta de nuevo, y la vista materializada
+es una tabla ya sacado y guardado.
+
+e)
+REFRESH MATERIALIZED VIEW aaqwertyEvalMat;
+SELECT * FROM aaqwertyEvalMat;
+Ahora son iguales, porque efecetivamente "REFRESH" reemplaza los contenidos de la consulta anterior, y ejecuta una nueva y guarda el resultado
+
+f)
+Stored procedure:
+CREATE FUNCTION updateqwerty() RETURNS TRIGGER AS $$ BEGIN REFRESH MATERIALIZED VIEW aaqwertyEvalMat; RETURN NEW; END; $$ LANGUAGE plpgsql;
+
+Disparador:
+CREATE TRIGGER triggerqwerty AFTER INSERT OR UPDATE ON lab8_p.eval FOR EACH ROW EXECUTE PROCEDURE updateqwerty();
+
+Una inserción
+INSERT INTO lab8_p.eval VALUES ('aaqwerty', 'Alien', 1979, 'listo', 10);
+
+SELECT * FROM aaqwertyEvalMat;
+Retorna lo esperado, lo de antes más la inserción de arriba. 
+
+Borrando todo
+DROP MATERIALIZED VIEW aaqwertyEvalMat;
+DROP VIEW aaqwertyEval;
+DROP TRIGGER triggerqwerty ON lab8_p.eval;
+DROP FUNCTION updateqwerty();

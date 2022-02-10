@@ -1,0 +1,137 @@
+Mi "grupo" se llama aaqwerty
+
+P1 
+a)
+Las consultas con GGGG reemplazado están en las siguientes respuestas
+
+b)
+CREATE TABLE lab9_p.aaqwerty_estado (
+    nombre varchar (255),
+	voto_electoral smallint,
+	cierre time,
+	num_candidatos smallint,
+	CONSTRAINT aaqwerty_estado_pk PRIMARY KEY (nombre)
+);
+
+INSERT INTO aaqwerty_estado SELECT * FROM estado;
+
+c)
+CREATE TABLE lab9_p.aaqwerty_condado (
+    nombre varchar (255),
+	estado varchar (255),
+	reportado float,
+    	FOREIGN KEY (estado) REFERENCES lab9_p.aaqwerty_estado (nombre),
+	PRIMARY KEY (nombre, estado), 
+	CHECK (reportado <= 1 AND reportado >= 0)
+);
+
+INSERT INTO aaqwerty_condado SELECT * FROM condado;
+
+d)
+CREATE TABLE lab9_p.aaqwerty_candidato (
+    nombre varchar (255),
+	partido varchar (255),
+ 	PRIMARY KEY (nombre)
+);
+
+INSERT INTO aaqwerty_candidato SELECT * FROM candidato;
+
+e)
+CREATE TABLE lab9_p.aaqwerty_votosPorCondado (
+    candidato varchar (255),
+	condado varchar (255),
+	estado varchar (255),
+    votos int,
+    CONSTRAINT aaqwerty_votosPorCondado_fk1 FOREIGN KEY (candidato) REFERENCES lab9_p.aaqwerty_candidato (nombre),
+    CONSTRAINT aaqwerty_votosPorCondado_fk2 FOREIGN KEY (condado, estado) REFERENCES lab9_p.aaqwerty_condado (nombre, estado),
+    CONSTRAINT aaqwerty_votosPorCondado_pk PRIMARY KEY (candidato, condado, estado)	
+);
+
+INSERT INTO aaqwerty_votosPorCondado SELECT * FROM votosPorCondado;
+
+P2
+UPDATE aaqwerty_votosPorCondado AS bar SET votos=foo.votos FROM votosPorCondado1 AS foo WHERE bar.candidato=foo.candidato 
+AND bar.condado=foo.condado AND bar.estado=foo.estado;
+
+P3
+UPDATE aaqwerty_condado AS bar SET reportado=foo.reportado FROM condado1 AS foo 
+WHERE bar.nombre=foo.nombre AND bar.estado=foo.estado;
+
+P4
+START TRANSACTION;
+UPDATE aaqwerty_votosPorCondado AS bar SET votos=foo.votos FROM votosPorCondado2 AS foo WHERE bar.candidato=foo.candidato 
+AND bar.condado=foo.condado AND bar.estado=foo.estado;
+UPDATE aaqwerty_condado AS bar SET reportado=foo.reportado FROM condado2 AS foo 
+WHERE bar.nombre=foo.nombre AND bar.estado=foo.estado;
+COMMIT;
+
+P5
+
+START TRANSACTION;
+UPDATE aaqwerty_votosPorCondado AS bar SET votos=foo.votos FROM votosPorCondado3 AS foo WHERE bar.candidato=foo.candidato 
+AND bar.condado=foo.condado AND bar.estado=foo.estado;
+UPDATE aaqwerty_condado AS bar SET reportado=foo.reportado FROM condado3 AS foo 
+WHERE bar.nombre=foo.nombre AND bar.estado=foo.estado;
+COMMIT;
+
+START TRANSACTION;
+UPDATE aaqwerty_votosPorCondado AS bar SET votos=foo.votos FROM votosPorCondado4 AS foo WHERE bar.candidato=foo.candidato 
+AND bar.condado=foo.condado AND bar.estado=foo.estado;
+UPDATE aaqwerty_condado AS bar SET reportado=foo.reportado FROM condado4 AS foo 
+WHERE bar.nombre=foo.nombre AND bar.estado=foo.estado;
+COMMIT;
+
+START TRANSACTION;
+UPDATE aaqwerty_votosPorCondado AS bar SET votos=foo.votos FROM votosPorCondado5 AS foo WHERE bar.candidato=foo.candidato 
+AND bar.condado=foo.condado AND bar.estado=foo.estado;
+UPDATE aaqwerty_condado AS bar SET reportado=foo.reportado FROM condado5 AS foo 
+WHERE bar.nombre=foo.nombre AND bar.estado=foo.estado;
+COMMIT;
+
+START TRANSACTION;
+UPDATE aaqwerty_votosPorCondado AS bar SET votos=foo.votos FROM votosPorCondado6 AS foo WHERE bar.candidato=foo.candidato 
+AND bar.condado=foo.condado AND bar.estado=foo.estado;
+UPDATE aaqwerty_condado AS bar SET reportado=foo.reportado FROM condado6 AS foo 
+WHERE bar.nombre=foo.nombre AND bar.estado=foo.estado;
+COMMIT;
+
+START TRANSACTION;
+UPDATE aaqwerty_votosPorCondado AS bar SET votos=foo.votos FROM votosPorCondado7 AS foo WHERE bar.candidato=foo.candidato 
+AND bar.condado=foo.condado AND bar.estado=foo.estado;
+UPDATE aaqwerty_condado AS bar SET reportado=foo.reportado FROM condado7 AS foo 
+WHERE bar.nombre=foo.nombre AND bar.estado=foo.estado;
+COMMIT;
+
+START TRANSACTION;
+UPDATE aaqwerty_votosPorCondado AS bar SET votos=foo.votos FROM votosPorCondado8 AS foo WHERE bar.candidato=foo.candidato 
+AND bar.condado=foo.condado AND bar.estado=foo.estado;
+UPDATE aaqwerty_condado AS bar SET reportado=foo.reportado FROM condado8 AS foo 
+WHERE bar.nombre=foo.nombre AND bar.estado=foo.estado;
+COMMIT;
+
+START TRANSACTION;
+UPDATE aaqwerty_votosPorCondado AS bar SET votos=foo.votos FROM votosPorCondado9 AS foo WHERE bar.candidato=foo.candidato 
+AND bar.condado=foo.condado AND bar.estado=foo.estado;
+UPDATE aaqwerty_condado AS bar SET reportado=foo.reportado FROM condado9 AS foo 
+WHERE bar.nombre=foo.nombre AND bar.estado=foo.estado;
+COMMIT;
+
+
+P6
+
+START TRANSACTION;
+UPDATE aaqwerty_votosPorCondado AS foo SET votos=bar.votos FROM votosPorCondadoX AS bar WHERE bar.candidato=foo.candidato
+AND bar.condado=foo.condado AND bar.estado=foo.estado;
+UPDATE aaqwerty_condado AS foo SET reportado=bar.reportado FROM condadoX AS bar
+WHERE bar.nombre=foo.nombre AND bar.estado=foo.estado;
+COMMIT;
+
+Salida de Postgres:
+ERROR new row ... violates check constraint ...
+Por la condición en aaqwerty_condado que require un valor entre 0 y 1 para el atributo reportado
+
+Putin no lo logró porque
+SELECT * FROM aaqwerty_votosPorCondado WHERE condado='Real County';
+no ha cambiado, y 
+SELECT candidato, COUNT(votos) AS conteo FROM aaqwerty_votosPorCondado GROUP BY candidato ORDER BY conteo DESC;
+tampoco. Trump gana.

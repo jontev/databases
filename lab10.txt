@@ -1,0 +1,31 @@
+1.
+//city/name
+
+2.
+//city/name/text()
+
+3.
+//country[@name="Chile"]
+
+4.
+//province[@name="Bahia"]/city[last()-1]/name/text()
+
+5.
+//city[normalize-space(name/text())="Guatemala"]/population/text()
+
+6.
+//city[population/text()>2000000]/ancestor::country/name/text()
+
+7.
+//city[not(population/text()>2000000)]/ancestor::country/name/text()
+
+8.
+number(//country[@name="Chile"]/@gdp_total) div (number(//country[@name="Chile"]/@population) div 1000)
+
+9.
+sum(//country[@name="Argentina"]//city/population)
+
+10.
+count(//city[@latitude < 0 and population >number(//country[@name="Chile"]//city[normalize-space(name/text())="Santiago"]/population)])
+
+

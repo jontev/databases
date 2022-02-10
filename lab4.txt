@@ -1,0 +1,35 @@
+p1.
+SELECT COUNT(*) AS conteo FROM pelicula;
+
+p2.
+SELECT COUNT(DISTINCT anho) AS conteo FROM pelicula;
+
+p3.
+SELECT nombre, anho, calificacion FROM (SELECT RANK() OVER (ORDER BY calificacion DESC, nombre, anho) AS rnk, *
+FROM pelicula) AS foo WHERE rnk <= 10;
+
+p4.
+SELECT DISTINCT a_nombre FROM personaje WHERE p_nombre IN (SELECT nombre FROM (SELECT RANK() OVER (ORDER BY calificacion DESC,
+nombre, anho) AS rnk, * FROM pelicula) AS foo WHERE rnk <= 10);
+
+p5.
+SELECT nombre FROM actor WHERE genero='F' AND nombre IN (SELECT DISTINCT a_nombre FROM personaje WHERE p_nombre IN (SELECT nombre FROM (SELECT RANK() OVER (ORDER BY calificacion DESC,
+nombre, anho) AS rnk, * FROM pelicula) AS foo WHERE rnk <= 10));
+
+p6.
+SELECT DISTINCT p_anho/10*10 as decada FROM personaje WHERE a_nombre='Eastwood, Clint';
+
+p7.
+SELECT anho, COUNT(nombre) AS conteo FROM pelicula GROUP BY anho;
+
+p8.
+SELECT anho, conteo FROM (SELECT anho, COUNT(nombre) as conteo FROM pelicula GROUP BY anho ORDER BY conteo DESC)
+AS foo WHERE conteo >= 2;
+
+p9.
+SELECT a_nombre AS actor, COUNT(nombre) AS conteo FROM (SELECT DISTINCT a_nombre, nombre FROM personaje INNER JOIN
+pelicula ON p_nombre=nombre WHERE calificacion >= 8.6) AS foo GROUP BY actor ORDER BY conteo DESC;
+
+p10.
+SELECT p_nombre, COUNT(nombre) as conteo FROM ( SELECT DISTINCT p_nombre, nombre FROM personaje LEFT JOIN (SELECT nombre FROM actor WHERE genero='F') as foo ON 
+a_nombre=nombre) as bar GROUP BY p_nombre;
